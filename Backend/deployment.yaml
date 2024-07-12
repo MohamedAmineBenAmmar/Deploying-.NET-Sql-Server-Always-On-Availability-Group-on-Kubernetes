@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: backend
+  labels:    
+    app: backend
+
+# Specification for the deployment
+spec:
+  replicas: 1
+  selector:
+    # Match every pod with the label (app: nginx) to the current deployment
+    matchLabels:
+      app: backend
+
+  # Defining a template for the pods
+  # The template has its own metadata and specification
+  template:
+    # metadata + spec are applied to pods
+    metadata:
+      labels:
+        app: backend
+    # Blueprint for the pod
+    spec: 
+      containers:
+      - name: backend-container
+        image: weather-backend:latest
+        imagePullPolicy: IfNotPresent 
+        ports:
+        # The port that the container is listening to
+        - containerPort: 8080

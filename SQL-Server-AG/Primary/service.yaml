@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mssql-primary-service
+  namespace: mssql
+spec:
+  selector:
+    app: mssql-primary
+  ports:
+    - name: sqlserver
+      protocol: TCP
+      port: 1433
+      targetPort: 1433
+    - name: endpoint
+      protocol: TCP
+      port: 5022
+      targetPort: 5022
+  type: LoadBalancer  

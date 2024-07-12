@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mssql-primary-pv
+  namespace: mssql
+spec:
+  capacity:
+    storage: 3Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "E:\\Dev\\Palyground\\.NET-K8S\\SQL-Server\\Data" 

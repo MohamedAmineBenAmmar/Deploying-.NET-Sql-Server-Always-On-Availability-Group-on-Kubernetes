@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mssql-primary-statefulset
+  namespace: mssql
+spec:
+  serviceName: mssql-primary-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mssql-primary
+  template:
+    metadata:
+      labels:
+        app: mssql-primary
+    spec:
+      securityContext:
+        fsGroup: 10001
+      containers:
+      - name: mssql-primary-container
+        image: mssql:latest
+        imagePullPolicy: IfNotPresent 
+        ports:
+        - containerPort: 1433
+          name: tcpsql
+        env:
+        - name: ACCEPT_EULA
+          value: "Y"
+        - name: MSSQL_ENABLE_HADR
+          value: "1"
+        - name: MSSQL_AGENT_ENABLED
+          value: "1"
+        - name: MSSQL_SA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mssql-primary-secret
+              key: MSSQL_SA_PASSWORD
+        volumeMounts:
+        - name: mssql-primary-volume
+          mountPath: "/var/opt/mssql"
+      volumes:
+      - name: mssql-primary-volume
+        persistentVolumeClaim:
+          claimName: mssql-primary-pvc

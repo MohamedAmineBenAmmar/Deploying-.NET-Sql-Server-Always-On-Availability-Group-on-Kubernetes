@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mssql-secondary-statefulset
+  namespace: mssql
+spec:
+  serviceName: mssql-secondary-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mssql-secondary
+  template:
+    metadata:
+      labels:
+        app: mssql-secondary
+    spec:
+      securityContext:
+        fsGroup: 10001
+      containers:
+      - name: mssql-secondary-container
+        image: mssql:latest
+        imagePullPolicy: IfNotPresent 
+        ports:
+        - containerPort: 1433
+          name: tcpsql
+        env:
+        - name: ACCEPT_EULA
+          value: "Y"
+        - name: MSSQL_ENABLE_HADR
+          value: "1"
+        - name: MSSQL_AGENT_ENABLED
+          value: "1"
+        - name: MSSQL_SA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mssql-secondary-secret
+              key: MSSQL_SA_PASSWORD
+        volumeMounts:
+        - name: mssql-secondary-volume
+          mountPath: "/var/opt/mssql"
+      volumes:
+      - name: mssql-secondary-volume
+        persistentVolumeClaim:
+          claimName: mssql-secondary-pvc
